@@ -1,0 +1,99 @@
+cat > src/scripts/create-admin.ts << 'EOF'
+type ExecContext = {
+  container: {
+    resolve: (key: string) => any
+  }
+}
+
+export default async function ({ container }: ExecContext) {
+  const email = process.env.ADMIN_EMAIL || "admin@myshop.local"
+  const password = process.env.ADMIN_PASSWORD || "Admin123!Admin123!"
+
+  // В твоя container има модул "user"
+  const userModule = container.resolve("user")
+
+  if (!userModule) {
+    throw new Error('User module "user" not found in container.')
+  }
+
+  const payload: any = {
+    email,
+    password,
+  }
+
+  // Някои версии очакват role / type за admin
+  // ще опитаме с role ако има нужда
+  const payloadWithRole: any = {
+    ...payload,
+    role: "admin",
+  }
+
+  const attempts: Array<{ name: string; fn: () => Promise<any> }> = []
+
+  if (typeof userModule.createUsers === "function") {
+    attempts.push({
+      name: "createUsers([payloadWithRole])",
+      fn: () => userModule.createUsers([payloadWithRole]),
+    })
+    attempts.push({
+      name: "createUsers([payload])",
+      fn: () => userModule.createUsers([payload]),
+    })
+  }
+
+  if (typeof userModule.createUser === "function") {
+    attempts.push({
+      name: "createUser(payloadWithRole)",
+      fn: () => userModule.createUser(payloadWithRole),
+    })
+    attempts.push({
+      name: "createUser(payload)",
+      fn: () => userModule.createUser(payload),
+    })
+  }
+
+  if (typeof userModule.create === "function") {
+    attempts.push({
+      name: "create(payloadWithRole)",
+      fn: () => userModule.create(payloadWithRole),
+    })
+    attempts.push({
+      name: "create(payload)",
+      fn: () => userModule.create(payload),
+    })
+  }
+
+  if (!attempts.length) {
+    const keys = Object.keys(userModule).sort()
+    throw new Error(
+      `User module няма create метод. Налични keys: ${keys.join(", ")}`
+    )
+  }
+
+  for (const a of attempts) {
+    try {
+      await a.fn()
+      console.log(`✅ Admin user създаден (${a.name}): ${email}`)
+      return
+    } catch (e: any) {
+      const msg = String(e?.message || e).toLowerCase()
+
+      // ако вече съществува - ок
+      if (
+        msg.includes("already") ||
+        msg.includes("exists") ||
+        msg.includes("duplicate") ||
+        msg.includes("unique")
+      ) {
+        console.log(`ℹ️ Admin вероятно вече съществува: ${email}`)
+        return
+      }
+
+      // ако role не е валиден/нужен, ще мине на следващия опит
+      // продължаваме
+    }
+  }
+
+  throw new Error("Не успях да създам admin user с наличните методи на user модула.")
+}
+EOF
