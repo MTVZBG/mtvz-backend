@@ -1,4 +1,5 @@
 import { SITE_ASSETS_MODULE } from "./src/modules/site-assets"
+import { CATEGORY_SEO_MODULE } from "./src/modules/category-seo"
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
@@ -32,6 +33,9 @@ module.exports = defineConfig({
     },
     [SITE_ASSETS_MODULE]: {
       resolve: "./src/modules/site-assets",
+    },
+    [CATEGORY_SEO_MODULE]: {
+      resolve: "./src/modules/category-seo",
     },
   },
 })
