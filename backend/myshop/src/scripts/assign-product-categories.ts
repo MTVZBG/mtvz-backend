@@ -115,11 +115,7 @@ export default async function assignProductCategories({ container }: any) {
           id: product.id,
         },
         update: {
-          categories: [
-            {
-              id: category.id,
-            },
-          ],
+          category_ids: [category.id],
         },
       },
     })

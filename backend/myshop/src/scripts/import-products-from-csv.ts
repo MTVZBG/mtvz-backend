@@ -21,6 +21,12 @@ type CsvProductRow = {
   imageUrl: string
 }
 
+type CategoryRow = {
+  id: string
+  handle: string
+  name?: string
+}
+
 function parseCsvLine(line: string): string[] {
   const result: string[] = []
   let current = ""
@@ -121,13 +127,13 @@ export default async function ({ container }: ExecContext) {
 
   const rows = readCsv()
 
-  const categories = await productModule.listProductCategories(
+  const categories = (await productModule.listProductCategories(
     {},
     {
       select: ["id", "handle", "name"],
       take: 500,
     }
-  )
+  )) as CategoryRow[]
 
   const categoryByHandle = new Map(categories.map((category) => [category.handle, category]))
 

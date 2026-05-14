@@ -8,6 +8,7 @@ module.exports = defineConfig({
     databaseUrl: process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
     workerMode: process.env.MEDUSA_WORKER_MODE as "shared" | "worker" | "server",
+
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -16,20 +17,21 @@ module.exports = defineConfig({
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
   },
+
   admin: {
     disable: process.env.DISABLE_MEDUSA_ADMIN === "true",
     backendUrl: process.env.MEDUSA_BACKEND_URL,
   },
-  modules: [
-    {
+
+  modules: {
+    eventBus: {
       resolve: "@medusajs/event-bus-redis",
       options: {
         redisUrl: process.env.REDIS_URL,
       },
     },
-    {
+    [SITE_ASSETS_MODULE]: {
       resolve: "./src/modules/site-assets",
-      key: SITE_ASSETS_MODULE,
     },
-  ],
+  },
 })
