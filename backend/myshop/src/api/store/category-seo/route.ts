@@ -9,6 +9,41 @@ const getFirstQueryValue = (value: unknown) => {
   return String(value || "").trim()
 }
 
+const stripHtml = (value: unknown) =>
+  String(value ?? "")
+    .replace(/<[^>]*>/g, "")
+    .trim()
+
+const ensurePlainObject = (value: unknown) =>
+  !!value && typeof value === "object" && !Array.isArray(value)
+
+const serializeMediaSections = (mediaSections: unknown) => {
+  if (mediaSections == null || !ensurePlainObject(mediaSections)) {
+    return null
+  }
+
+  const source = mediaSections as any
+
+  return {
+    intro_image: {
+      image_url: stripHtml(source.intro_image?.image_url),
+      alt: stripHtml(source.intro_image?.alt),
+      caption: stripHtml(source.intro_image?.caption),
+    },
+    video: {
+      video_url: stripHtml(source.video?.video_url),
+      title: stripHtml(source.video?.title),
+      description: stripHtml(source.video?.description),
+    },
+    bottom_image: {
+      image_url: stripHtml(source.bottom_image?.image_url),
+      alt: stripHtml(source.bottom_image?.alt),
+      title: stripHtml(source.bottom_image?.title),
+      text: stripHtml(source.bottom_image?.text),
+    },
+  }
+}
+
 const serializeStoreCategorySeoContent = (content: any) => ({
   category_handle: content.category_handle,
   locale: content.locale,
@@ -17,6 +52,7 @@ const serializeStoreCategorySeoContent = (content: any) => ({
   intro_text: content.intro_text,
   bottom_text: content.bottom_text,
   faq: Array.isArray(content.faq) ? content.faq : [],
+  media_sections: serializeMediaSections(content.media_sections),
 })
 
 export const GET = async (

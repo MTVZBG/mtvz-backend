@@ -13,6 +13,25 @@ type FaqItem = {
   answer: string
 }
 
+type CategorySeoMediaSections = {
+  intro_image: {
+    image_url: string
+    alt: string
+    caption: string
+  }
+  video: {
+    video_url: string
+    title: string
+    description: string
+  }
+  bottom_image: {
+    image_url: string
+    alt: string
+    title: string
+    text: string
+  }
+}
+
 type CategorySeoDraft = {
   category_handle: string
   locale: string
@@ -21,8 +40,28 @@ type CategorySeoDraft = {
   intro_text: string
   bottom_text: string
   faq: FaqItem[]
+  media_sections: CategorySeoMediaSections
   is_active: boolean
 }
+
+const createEmptyMediaSections = (): CategorySeoMediaSections => ({
+  intro_image: {
+    image_url: "",
+    alt: "",
+    caption: "",
+  },
+  video: {
+    video_url: "",
+    title: "",
+    description: "",
+  },
+  bottom_image: {
+    image_url: "",
+    alt: "",
+    title: "",
+    text: "",
+  },
+})
 
 const createEmptyDraft = (categoryHandle = ""): CategorySeoDraft => ({
   category_handle: categoryHandle,
@@ -32,6 +71,7 @@ const createEmptyDraft = (categoryHandle = ""): CategorySeoDraft => ({
   intro_text: "",
   bottom_text: "",
   faq: [],
+  media_sections: createEmptyMediaSections(),
   is_active: true,
 })
 
@@ -44,6 +84,35 @@ const normalizeFaq = (faq: unknown): FaqItem[] => {
     question: String(item?.question || ""),
     answer: String(item?.answer || ""),
   }))
+}
+
+const normalizeMediaSections = (mediaSections: unknown): CategorySeoMediaSections => {
+  const emptyMediaSections = createEmptyMediaSections()
+
+  if (!mediaSections || typeof mediaSections !== "object" || Array.isArray(mediaSections)) {
+    return emptyMediaSections
+  }
+
+  const source = mediaSections as Partial<CategorySeoMediaSections>
+
+  return {
+    intro_image: {
+      image_url: String(source.intro_image?.image_url || ""),
+      alt: String(source.intro_image?.alt || ""),
+      caption: String(source.intro_image?.caption || ""),
+    },
+    video: {
+      video_url: String(source.video?.video_url || ""),
+      title: String(source.video?.title || ""),
+      description: String(source.video?.description || ""),
+    },
+    bottom_image: {
+      image_url: String(source.bottom_image?.image_url || ""),
+      alt: String(source.bottom_image?.alt || ""),
+      title: String(source.bottom_image?.title || ""),
+      text: String(source.bottom_image?.text || ""),
+    },
+  }
 }
 
 const CategorySeoPage = () => {
@@ -109,6 +178,7 @@ const CategorySeoPage = () => {
               intro_text: content.intro_text || "",
               bottom_text: content.bottom_text || "",
               faq: normalizeFaq(content.faq),
+              media_sections: normalizeMediaSections(content.media_sections),
               is_active: content.is_active ?? true,
             }
           : createEmptyDraft(categoryHandle)
@@ -168,6 +238,26 @@ const CategorySeoPage = () => {
     setDraft((current) => ({
       ...current,
       [field]: value,
+    }))
+  }
+
+  const updateMediaSection = <
+    TSection extends keyof CategorySeoMediaSections,
+    TField extends keyof CategorySeoMediaSections[TSection]
+  >(
+    section: TSection,
+    field: TField,
+    value: string
+  ) => {
+    setDraft((current) => ({
+      ...current,
+      media_sections: {
+        ...current.media_sections,
+        [section]: {
+          ...current.media_sections[section],
+          [field]: value,
+        },
+      },
     }))
   }
 
@@ -232,6 +322,7 @@ const CategorySeoPage = () => {
         intro_text: content.intro_text || "",
         bottom_text: content.bottom_text || "",
         faq: normalizeFaq(content.faq),
+        media_sections: normalizeMediaSections(content.media_sections),
         is_active: content.is_active ?? true,
       })
       setMessage("Saved.")
@@ -322,6 +413,117 @@ const CategorySeoPage = () => {
               onChange={(event) => updateDraft("bottom_text", event.target.value)}
             />
           </label>
+
+          <div style={{ display: "grid", gap: 16 }}>
+            <Heading level="h2">SEO Media Sections</Heading>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              <Text>Intro image</Text>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Image URL</Text>
+                <Input
+                  type="url"
+                  value={draft.media_sections.intro_image.image_url}
+                  onChange={(event) =>
+                    updateMediaSection("intro_image", "image_url", event.target.value)
+                  }
+                />
+              </label>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Alt text</Text>
+                <Input
+                  value={draft.media_sections.intro_image.alt}
+                  onChange={(event) =>
+                    updateMediaSection("intro_image", "alt", event.target.value)
+                  }
+                />
+              </label>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Caption</Text>
+                <Input
+                  value={draft.media_sections.intro_image.caption}
+                  onChange={(event) =>
+                    updateMediaSection("intro_image", "caption", event.target.value)
+                  }
+                />
+              </label>
+            </div>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              <Text>Video</Text>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Video URL</Text>
+                <Input
+                  type="url"
+                  value={draft.media_sections.video.video_url}
+                  onChange={(event) =>
+                    updateMediaSection("video", "video_url", event.target.value)
+                  }
+                />
+              </label>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Video title</Text>
+                <Input
+                  value={draft.media_sections.video.title}
+                  onChange={(event) =>
+                    updateMediaSection("video", "title", event.target.value)
+                  }
+                />
+              </label>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Video description</Text>
+                <Textarea
+                  rows={3}
+                  value={draft.media_sections.video.description}
+                  onChange={(event) =>
+                    updateMediaSection("video", "description", event.target.value)
+                  }
+                />
+              </label>
+            </div>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              <Text>Bottom image/content</Text>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Image URL</Text>
+                <Input
+                  type="url"
+                  value={draft.media_sections.bottom_image.image_url}
+                  onChange={(event) =>
+                    updateMediaSection("bottom_image", "image_url", event.target.value)
+                  }
+                />
+              </label>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Alt text</Text>
+                <Input
+                  value={draft.media_sections.bottom_image.alt}
+                  onChange={(event) =>
+                    updateMediaSection("bottom_image", "alt", event.target.value)
+                  }
+                />
+              </label>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Title</Text>
+                <Input
+                  value={draft.media_sections.bottom_image.title}
+                  onChange={(event) =>
+                    updateMediaSection("bottom_image", "title", event.target.value)
+                  }
+                />
+              </label>
+              <label style={{ display: "grid", gap: 8 }}>
+                <Text size="small">Text</Text>
+                <Textarea
+                  rows={4}
+                  value={draft.media_sections.bottom_image.text}
+                  onChange={(event) =>
+                    updateMediaSection("bottom_image", "text", event.target.value)
+                  }
+                />
+              </label>
+            </div>
+          </div>
 
           <div style={{ display: "grid", gap: 12 }}>
             <div

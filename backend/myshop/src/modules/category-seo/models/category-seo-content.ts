@@ -9,6 +9,7 @@ const CategorySeoContent = model.define("category_seo_content", {
   intro_text: model.text(),
   bottom_text: model.text(),
   faq: model.json().nullable(),
+  media_sections: model.json().nullable(),
   is_active: model.boolean().default(true),
 })
 
