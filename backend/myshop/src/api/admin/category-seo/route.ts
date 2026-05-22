@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { CATEGORY_SEO_MODULE } from "../../../modules/category-seo"
+import { sanitizeRichText } from "../../../lib/sanitize-rich-text"
 
 type FaqItem = {
   question?: string | null
@@ -182,8 +183,8 @@ const serializeCategorySeoContent = (content: any) => ({
   locale: content.locale,
   seo_title: content.seo_title,
   seo_description: content.seo_description,
-  intro_text: content.intro_text,
-  bottom_text: content.bottom_text,
+  intro_text: sanitizeRichText(content.intro_text),
+  bottom_text: sanitizeRichText(content.bottom_text),
   faq: Array.isArray(content.faq) ? content.faq : [],
   media_sections: serializeMediaSections(content.media_sections),
   is_active: content.is_active,
@@ -249,8 +250,8 @@ export const POST = async (
     locale,
     seo_title: body.seo_title ?? "",
     seo_description: body.seo_description ?? "",
-    intro_text: body.intro_text ?? "",
-    bottom_text: body.bottom_text ?? "",
+    intro_text: sanitizeRichText(body.intro_text),
+    bottom_text: sanitizeRichText(body.bottom_text),
     faq: normalizeFaq(body.faq),
     media_sections: mediaSections,
     is_active: body.is_active ?? true,

@@ -1,6 +1,7 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { Button, Container, Heading, Input, Switch, Text, Textarea } from "@medusajs/ui"
 import { useEffect, useMemo, useState } from "react"
+import RichTextEditor from "../../components/rich-text-editor"
 
 type ProductCategory = {
   id: string
@@ -396,23 +397,18 @@ const CategorySeoPage = () => {
             />
           </label>
 
-          <label style={{ display: "grid", gap: 8 }}>
-            <Text>Intro text</Text>
-            <Textarea
-              rows={6}
-              value={draft.intro_text}
-              onChange={(event) => updateDraft("intro_text", event.target.value)}
-            />
-          </label>
+          <RichTextEditor
+            label="Intro text"
+            value={draft.intro_text}
+            onChange={(value) => updateDraft("intro_text", value)}
+          />
 
-          <label style={{ display: "grid", gap: 8 }}>
-            <Text>Bottom SEO text</Text>
-            <Textarea
-              rows={8}
-              value={draft.bottom_text}
-              onChange={(event) => updateDraft("bottom_text", event.target.value)}
-            />
-          </label>
+          <RichTextEditor
+            label="Bottom SEO text"
+            value={draft.bottom_text}
+            onChange={(value) => updateDraft("bottom_text", value)}
+            minHeight={240}
+          />
 
           <div style={{ display: "grid", gap: 16 }}>
             <Heading level="h2">SEO Media Sections</Heading>

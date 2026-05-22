@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { CATEGORY_SEO_MODULE } from "../../../modules/category-seo"
+import { sanitizeRichText } from "../../../lib/sanitize-rich-text"
 
 const getFirstQueryValue = (value: unknown) => {
   if (Array.isArray(value)) {
@@ -49,8 +50,8 @@ const serializeStoreCategorySeoContent = (content: any) => ({
   locale: content.locale,
   seo_title: content.seo_title,
   seo_description: content.seo_description,
-  intro_text: content.intro_text,
-  bottom_text: content.bottom_text,
+  intro_text: sanitizeRichText(content.intro_text),
+  bottom_text: sanitizeRichText(content.bottom_text),
   faq: Array.isArray(content.faq) ? content.faq : [],
   media_sections: serializeMediaSections(content.media_sections),
 })
