@@ -24,3 +24,9 @@ build
 !.yarn/versions
 
 .medusa
+
+# Public static must not contain generated private/export/test artifacts.
+static/private-*
+static/*product-exports*.csv
+static/*product-import-template*.json
+static/*test*.txt

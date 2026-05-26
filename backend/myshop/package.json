@@ -26,7 +26,8 @@
     "@medusajs/cli": "2.13.1",
     "@medusajs/event-bus-redis": "^2.13.1",
     "@medusajs/framework": "2.13.1",
-    "@medusajs/medusa": "2.13.1"
+    "@medusajs/medusa": "2.13.1",
+    "multer": "^2.1.0"
   },
   "devDependencies": {
     "@medusajs/test-utils": "2.13.1",
