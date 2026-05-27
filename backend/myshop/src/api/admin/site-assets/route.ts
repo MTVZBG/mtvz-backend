@@ -35,7 +35,6 @@ const REQUIRED_NON_EMPTY_STRING_FIELDS = [
   "entity_type",
   "slot",
   "label",
-  "image_url",
 ] as const
 
 const validateSiteAssetPayload = (payload: SiteAssetWritePayload) => {
@@ -45,6 +44,10 @@ const validateSiteAssetPayload = (payload: SiteAssetWritePayload) => {
     if (typeof value !== "string" || !value.trim()) {
       return `Field '${field}' must be a non-empty string.`
     }
+  }
+
+  if (typeof payload.image_url !== "string") {
+    return "Field 'image_url' must be a string."
   }
 
   if (typeof payload.alt_text !== "string") {
