@@ -66,6 +66,18 @@ const createSafeFileName = (originalName: string, extension: string) => {
   return `${Date.now()}-${crypto.randomUUID()}-${safeBaseName}${extension}`
 }
 
+const resolveProjectStaticDir = () => {
+  const cwd = path.resolve(process.cwd())
+  const medusaServerMarker = `${path.sep}.medusa${path.sep}server`
+  const markerIndex = cwd.lastIndexOf(medusaServerMarker)
+
+  if (markerIndex >= 0) {
+    return path.join(cwd.slice(0, markerIndex), "static")
+  }
+
+  return path.join(cwd, "static")
+}
+
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const file = (req as any).file as UploadedFile | undefined
 
@@ -113,7 +125,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
   const fileName = createSafeFileName(originalName, extension)
 
-  const staticDir = path.join(process.cwd(), "static")
+  const staticDir = resolveProjectStaticDir()
   const filePath = path.join(staticDir, fileName)
 
   await fs.mkdir(staticDir, { recursive: true })
