@@ -54,6 +54,16 @@ const hasValidImageSignature = (mimeType: string, buffer: Buffer) => {
   return false
 }
 
+const getUploadDebugInfo = (file: UploadedFile, buffer?: Buffer) => ({
+  originalname: file.originalname || null,
+  mimetype: file.mimetype || null,
+  size: file.size || null,
+  bufferIsBuffer: Boolean(buffer && Buffer.isBuffer(buffer)),
+  bufferLength: buffer?.length || null,
+  first16BytesHex: buffer ? buffer.subarray(0, 16).toString("hex") : null,
+  first16BytesAscii: buffer ? buffer.subarray(0, 16).toString("ascii") : null,
+})
+
 const createSafeFileName = (originalName: string, extension: string) => {
   const rawBaseName = path.basename(originalName, path.extname(originalName))
   const safeBaseName =
@@ -89,7 +99,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
   if (!file.buffer || !Buffer.isBuffer(file.buffer)) {
     return res.status(400).json({
-      message: "Invalid image signature.",
+      message: "Uploaded file buffer is missing.",
+      debug: getUploadDebugInfo(file),
     })
   }
 
@@ -105,6 +116,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   if (!allowedExtensions) {
     return res.status(400).json({
       message: "Unsupported MIME type. Only JPEG, PNG, and WebP images are allowed.",
+      debug: getUploadDebugInfo(file, file.buffer),
     })
   }
 
@@ -114,12 +126,14 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   if (!allowedExtensions.includes(extension)) {
     return res.status(400).json({
       message: "Unsupported file extension. Only .jpg, .jpeg, .png, and .webp are allowed.",
+      debug: getUploadDebugInfo(file, file.buffer),
     })
   }
 
   if (!hasValidImageSignature(mimeType, file.buffer)) {
     return res.status(400).json({
       message: "Invalid image signature.",
+      debug: getUploadDebugInfo(file, file.buffer),
     })
   }
 
