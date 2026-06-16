@@ -87,17 +87,22 @@ function readCsv(): CsvPriceRow[] {
     }
 
     const sku = row[0]
-    const price = Number(row[1])
+    const rawPrice = row[1]
+    const price = Number(rawPrice)
 
     if (!sku) {
       throw new Error(`Missing SKU on row ${index + 2}`)
+    }
+
+    if (!rawPrice) {
+      throw new Error(`Missing price on row ${index + 2}`)
     }
 
     if (seenSkus.has(sku)) {
       throw new Error(`Duplicate SKU in CSV: ${sku}`)
     }
 
-    if (!Number.isFinite(price) || price < 0) {
+    if (!Number.isFinite(price) || price <= 0) {
       throw new Error(`Invalid price on row ${index + 2}: ${row[1]}`)
     }
 
