@@ -1,5 +1,5 @@
 import fs from "fs"
-import { upsertVariantPricesWorkflow } from "@medusajs/medusa/core-flows"
+import { updateProductVariantsWorkflow } from "@medusajs/medusa/core-flows"
 
 const CSV_PATH = "prices-import.csv"
 const CURRENCY_CODE = "eur"
@@ -204,15 +204,14 @@ export default async function ({ container }: ExecContext) {
   if (!shouldApply) {
     console.log("PREVIEW ONLY. No prices were updated.")
     console.log("To update prices, run:")
-    console.log("npx medusa exec ./src/scripts/update-product-prices-from-csv.ts --apply")
+    console.log("npx medusa exec ./src/scripts/update-product-prices-from-csv.ts -- --apply")
     return
   }
 
-  const { result } = await upsertVariantPricesWorkflow(container).run({
+  const { result } = await updateProductVariantsWorkflow(container).run({
     input: {
-      variantPrices: matches.map((match) => ({
-        variant_id: match.variantId,
-        product_id: match.productId,
+      product_variants: matches.map((match) => ({
+        id: match.variantId,
         prices: [
           {
             amount: match.price,
@@ -220,7 +219,6 @@ export default async function ({ container }: ExecContext) {
           },
         ],
       })),
-      previousVariantIds: [],
     },
   })
 
