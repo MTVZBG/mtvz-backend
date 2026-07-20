@@ -40,3 +40,6 @@ codex-*.diff
 
 # Admin-uploaded category SEO media
 static/category-seo/
+
+# Admin-uploaded/generated static webp assets
+static/*.webp
