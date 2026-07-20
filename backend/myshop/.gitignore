@@ -30,3 +30,13 @@ static/private-*
 static/*product-exports*.csv
 static/*product-import-template*.json
 static/*test*.txt
+
+# Runtime/import artifacts
+build.log
+prices-import.csv
+products-import.csv
+codex-*.txt
+codex-*.diff
+
+# Admin-uploaded category SEO media
+static/category-seo/
