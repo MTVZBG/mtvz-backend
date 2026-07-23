@@ -3,7 +3,7 @@ import { createProductsWorkflow } from "@medusajs/medusa/core-flows"
 
 const CSV_PATH = "products-import.csv"
 const SALES_CHANNEL_ID = "sc_01KMHYS60JDX7TARN7DSWZF8SC"
-const CURRENCY_CODE = "bgn"
+const CURRENCY_CODE = "eur"
 
 type ExecContext = {
   container: any
